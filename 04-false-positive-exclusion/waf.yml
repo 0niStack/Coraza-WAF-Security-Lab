@@ -1,0 +1,27 @@
+# 04 - FALSE POSITIVE EXAMPLE
+# Scenario: DVWA's reflected-XSS page (/vulnerabilities/xss_r/) is pretend-legit and
+# accepts HTML in "name", so CRS blocks it. We exclude XSS rules ONLY for that path.
+# Everything else (other paths, SQLi, etc.) stays fully protected.
+http:
+  middlewares:
+    waf:
+      plugin:
+        coraza:
+          directives:
+            - SecRuleEngine On
+            - SecRequestBodyAccess On
+            - Include @recommended-conf
+            - Include @crs-setup-conf
+
+            # ---- exclusions: must come BEFORE the CRS include ----
+            # Path-scoped: disable all rules tagged attack-xss for this URL only
+            - >-
+              SecRule REQUEST_URI "@beginsWith /vulnerabilities/xss_r"
+              "id:10001,phase:1,pass,nolog,ctl:ruleRemoveByTag=attack-xss"
+
+            # Narrower alternative (one parameter only), if your Coraza version supports it:
+            # - >-
+            #   SecRule REQUEST_URI "@beginsWith /vulnerabilities/xss_r"
+            #   "id:10002,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=attack-xss;ARGS:name"
+
+            - Include @owasp_crs/*.conf

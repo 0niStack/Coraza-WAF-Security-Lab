@@ -1,0 +1,26 @@
+api:
+  dashboard: true
+  insecure: true   # lab only
+
+log:
+  level: INFO
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: waf-net
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+# Coraza WAF plugin (downloaded from the Traefik plugin catalog at startup,
+# so the container needs outbound internet on first run)
+experimental:
+  plugins:
+    coraza:
+      moduleName: github.com/jcchavezs/coraza-http-wasm-traefik
+      version: v0.3.0

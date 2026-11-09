@@ -1,0 +1,43 @@
+# 02 - DVWA (intentionally vulnerable app). Not published on any host port:
+# the only way in is through Traefik + Coraza from stack 01.
+services:
+  dvwa:
+    image: ghcr.io/digininja/dvwa:latest
+    container_name: dvwa
+    restart: unless-stopped
+    environment:
+      - DB_SERVER=db
+    depends_on:
+      - db
+    networks:
+      - waf-net
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=waf-net"
+      - "traefik.http.routers.dvwa.rule=Host(`dvwa.localhost`)"
+      - "traefik.http.routers.dvwa.entrypoints=web"
+      - "traefik.http.routers.dvwa.middlewares=waf@file"
+      - "traefik.http.services.dvwa.loadbalancer.server.port=80"
+
+  db:
+    image: mariadb:10
+    container_name: dvwa-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=dvwa
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+    volumes:
+      - dvwa-db:/var/lib/mysql
+    networks:
+      - internal
+
+networks:
+  waf-net:
+    external: true
+  internal:
+
+volumes:
+  dvwa-db:

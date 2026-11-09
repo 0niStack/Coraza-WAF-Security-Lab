@@ -1,0 +1,35 @@
+# 05 - CUSTOM POLICY EXAMPLE
+# Adds your own block rules on top of CRS. Local rule IDs: 10000-19999 here.
+http:
+  middlewares:
+    waf:
+      plugin:
+        coraza:
+          directives:
+            - SecRuleEngine On
+            - SecRequestBodyAccess On
+            - Include @recommended-conf
+            - Include @crs-setup-conf
+
+            # ---- custom policies: BEFORE the CRS include ----
+            # 1) Block a sensitive path
+            - >-
+              SecRule REQUEST_URI "@beginsWith /secret-admin"
+              "id:10010,phase:1,deny,status:403,log,msg:'Custom: blocked sensitive path'"
+
+            # 2) Block bad bots by User-Agent
+            - >-
+              SecRule REQUEST_HEADERS:User-Agent "@pm badbot evilscanner"
+              "id:10011,phase:1,deny,status:403,log,msg:'Custom: blocked bad user agent'"
+
+            # 3) Block a debug query parameter
+            - >-
+              SecRule ARGS:debug "@streq true"
+              "id:10012,phase:2,deny,status:403,log,msg:'Custom: debug=true not allowed'"
+
+            # 4) Block an IP/range (set your own, then uncomment)
+            # - >-
+            #   SecRule REMOTE_ADDR "@ipMatch 203.0.113.5,198.51.100.0/24"
+            #   "id:10013,phase:1,deny,status:403,log,msg:'Custom: blocked IP'"
+
+            - Include @owasp_crs/*.conf

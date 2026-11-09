@@ -1,0 +1,12 @@
+http:
+  middlewares:
+    waf:
+      plugin:
+        coraza:
+          directives:
+            - SecRuleEngine On          # use DetectionOnly to log without blocking
+            - SecRequestBodyAccess On
+            - SecResponseBodyAccess Off
+            - Include @recommended-conf
+            - Include @crs-setup-conf
+            - Include @owasp_crs/*.conf

@@ -8,8 +8,9 @@ http:
           directives:
             - SecRuleEngine On
             - SecRequestBodyAccess On
-            - Include @recommended-conf
-            - Include @crs-setup-conf
+            - Include @coraza.conf-recommended
+            - SecRuleEngine On
+            - Include @crs-setup.conf.example
 
             # ---- custom policies: BEFORE the CRS include ----
             # 1) Block a sensitive path

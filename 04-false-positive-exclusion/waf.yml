@@ -10,8 +10,9 @@ http:
           directives:
             - SecRuleEngine On
             - SecRequestBodyAccess On
-            - Include @recommended-conf
-            - Include @crs-setup-conf
+            - Include @coraza.conf-recommended
+            - SecRuleEngine On
+            - Include @crs-setup.conf.example
 
             # ---- exclusions: must come BEFORE the CRS include ----
             # Path-scoped: disable all rules tagged attack-xss for this URL only

@@ -2,8 +2,10 @@
 # Start this FIRST: it creates the shared network "waf-net".
 services:
   traefik:
-    image: traefik:v3.1
+    image: traefik:v3.6.1
     container_name: traefik
+    environment:
+      - DOCKER_API_VERSION=1.44
     restart: unless-stopped
     ports:
       - "80:80"

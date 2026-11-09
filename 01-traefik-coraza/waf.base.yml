@@ -4,9 +4,11 @@ http:
       plugin:
         coraza:
           directives:
-            - SecRuleEngine On          # use DetectionOnly to log without blocking
+            - SecRuleEngine On
             - SecRequestBodyAccess On
             - SecResponseBodyAccess Off
-            - Include @recommended-conf
-            - Include @crs-setup-conf
+            - Include @coraza.conf-recommended
+            - SecRuleEngine On
+            - Include @crs-setup.conf.example
+            - SecAction "id:900000,phase:1,pass,t:none,nolog,setvar:tx.blocking_paranoia_level=2"
             - Include @owasp_crs/*.conf
